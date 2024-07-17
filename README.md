@@ -4,9 +4,9 @@
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
-![](imgs/test.png)  |  ![](imgs/test.png) |  ![](imgs/test.png)
-:-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
-Unfolded band structure - flatband mode (Si0.5Ge0.5) |  Unfolded band structure - density mode (Si0.5Ge0.5) | Band structures overlay (Si0.5Ge0.5: Red, pure Si: black, pure Ge: blue)
+![](imgs/AlN_AlGaN_AlN.png)
+:-------------------------:
+AlN/AlGaN/AlN HEMT structure
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
@@ -40,32 +40,24 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
     7. matplotlib
 ```
 
-### 2. Installation using `pip`
+### 2. Installation from github repository
 
 ```
-    pip install xrdpy
-```
-
-### 3. Installation from github repository
-
-```
-    git clone https://github.com/band-unfolding/banduppy.git
+    git clone https://github.com/XRDmapAnalysis/xrdpy.git
     cd xrdpy
     pip install .  
 ```
 Or, without cloning
 ```
-    pip install git+https://github.com/band-unfolding/banduppy.git #@specific_branch
+    pip install git+https://github.com/XRDmapAnalysis/xrdpy.git #@specific_branch
 ```
 
-### 4. Installation using `setup.py` [deprecated]
-Alternatively you can clone the repository and run `setup.py` in the usual manner:
+### 3. Installation using `pip` [* not available yet]
 
 ```
-    git clone https://github.com/band-unfolding/banduppy.git
-    cd banduppy
-    python setup.py install
+    pip install xrdpy
 ```
+
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
@@ -75,12 +67,9 @@ __Documentation__: [here](docs/USAGE.md)
 The detailed documentation is available [here](docs/USAGE.md). Explore the [tutorial](tutorials) folder for example tutorials. Below are quick snippets showcasing what you can achieve with `xrdpy`:
 ```
 xrdpy package:
-    1. Unfolding class 
-        1.1 propose_maximum_minimum_folding()
-        1.2 generate_SC_Kpts_from_pc_kpts()
-        1.3 generate_SC_Kpts_from_pc_k_path()
-        1.3 Unfold()
-        1.4 plot_ebs() [Note: Similar in Plotting class but can not plot band centers]
+    1. xrd class
+        1.1 read_xrd_data()
+        1.2 plot_xrd()
 ```
 
 <!-- =========================================================== -->
@@ -95,20 +84,15 @@ You can find a list of common user issues encountered while using this software 
 <!-- =========================================================== -->
 ## Citations and references:
 
-If you use `BandUPpy` in your work, please:
+If you use `xrdpy` in your work, please:
 
-  * **State EXPLICITLY that you have used the BandUP code** (or a modified version of it, if this is the case), for instance, adding a sentence like: 
+  * **State EXPLICITLY that you have used the xrdpy code** (or a modified version of it, if this is the case), for instance, adding a sentence like:
 
-         "The unfolding has been performed using the BandUP(py) code"
+         "The xrd analysis has been performed using the xrdpy code"
 
   * **Read and cite the following papers** (and the appropriate references therein):
     
->> 1. Paulo V. C. Medeiros, Sven Stafström, and Jonas Björk,
-   [Phys. Rev. B **89**, 041407(R) (2014)](http://doi.org/10.1103/PhysRevB.89.041407)  
->> 2. Paulo V. C. Medeiros, Stepan S. Tsirkin, Sven Stafström, and Jonas Björk,
-   [Phys. Rev. B **91**, 041116(R) (2015)](http://doi.org/10.1103/PhysRevB.91.041116)  
->> 3. Mikel Iraola, Juan L. Mañes, Barry Bradlyn, Titus Neupert, Maia G. Vergniory, Stepan S. Tsirkin,
-   "IrRep: Symmetry eigenvalues and irreducible representations of ab initio band structures", [Comput. Phys. Commun. **272**, 108226 (2022)](https://doi.org/10.1016/j.cpc.2021.108226)
+>> 1.
 
 __Bibliography file:__ Here is the [bibliography file](docs/REFERENCES.md) for your convenience.
 
@@ -116,7 +100,7 @@ __Bibliography file:__ Here is the [bibliography file](docs/REFERENCES.md) for y
 
 <!-- =========================================================== -->
 ## Version release
-__Latest release: v0.3.4__
+__Latest release: v0.0.1__
 
 Chekout out [version release history here](docs/RELEASE.md) for the full list of updates and upgrades.
 
