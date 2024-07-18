@@ -11,11 +11,11 @@ setuptools.setup(
      author_email="badalmondal.chembgc@gmail.com",
      maintainer="Pietro Pampili",
      maintainer_email="badalmondal.chembgc@gmail.com",
-     description="xrdpy: Python package 2D x-ray diffraction data analysis",
+     description="xrdpy: Python package for 2D X-ray diffraction data analysis",
      long_description=long_description,
      long_description_content_type="text/markdown",
      install_requires=['numpy', 'scipy>= 1.0', 'matplotlib'],
-     url="https://github.com/pampili/XRDmapAnalysis",
+     url="https://github.com/XRDmapAnalysis/xrdpy",
      packages=setuptools.find_packages(),
      classifiers=[
          "Programming Language :: Python :: 3",
