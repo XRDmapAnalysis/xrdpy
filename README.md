@@ -4,9 +4,9 @@
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
-![](imgs/AlN_AlGaN_AlN.png)
-:-------------------------:
-AlN/AlGaN/AlN HEMT structure
+![](imgs/AlN_AlGaN_AlN_real_space.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space.png) | ![](imgs/AlN_AlGaN_AlN_2reciprocal_space.png)
+:-------------------------:|:-------------------------:|:-------------------------:
+AlGaN/AlN HEMT real space XRD | AlGaN/AlN HEMT reciprocal space XRD | AlGaN/AlN HEMT reciprocal space XRD
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
@@ -19,7 +19,7 @@ __Developer of xrdpy :__
 
 * [Pietro Pampili](https://github.com/pampili)
 
-__xrdpy Contributors:__  [Contributors](https://github.com/XRDmapAnalysis/graphs/contributors)
+__xrdpy Contributors:__  [Contributors](https://github.com/XRDmapAnalysis/xrdpy/graphs/contributors)
 
 * We sincerely thank each and every contributor for their valuable input and support.
 
@@ -34,7 +34,7 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
 
 ### 1. Requirements
 ```
-    1. python>=3.7
+    1. python>=3.10
     3. numpy
     5. scipy>=1.0
     7. matplotlib
@@ -64,12 +64,21 @@ Or, without cloning
 ## Usage
 __Documentation__: [here](docs/USAGE.md)
 
-The detailed documentation is available [here](docs/USAGE.md). Explore the [tutorial](tutorials) folder for example tutorials. Below are quick snippets showcasing what you can achieve with `xrdpy`:
+The detailed documentation is available [here](docs/USAGE.md). Explore the [tutorial](tests) folder for example tutorials. Below are quick snippets showcasing what you can achieve with `xrdpy`:
 ```
 xrdpy package:
+    1. general_fns class
+        1.1 alloy_parameters_from_binary()
     1. xrd class
-        1.1 read_xrd_data()
-        1.2 plot_xrd()
+        1.1 xrd_read_data()
+        1.2 find_composition_strain_4_point()
+        1.3 get_full_strain_line()
+        1.4 Qxy()
+        1.5 Qxy_theor()
+        1.6 xrd_plot()
+    3. plottings class
+        3.1 xrd_plot()
+        3.2 save_figure()
 ```
 
 <!-- =========================================================== -->
@@ -88,7 +97,7 @@ If you use `xrdpy` in your work, please:
 
   * **State EXPLICITLY that you have used the xrdpy code** (or a modified version of it, if this is the case), for instance, adding a sentence like:
 
-         "The xrd analysis has been performed using the xrdpy code"
+         "The XRD analysis has been performed using the xrdpy code"
 
   * **Read and cite the following papers** (and the appropriate references therein):
     

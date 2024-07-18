@@ -1,5 +1,5 @@
 __version__ = "0.0.1"
 
-from .XRD import xrd
+from .XRD import general_fns, xrd, plottings
 
-__all__ = ['xrd']
+__all__ = ['general_fns', 'xrd', 'plottings']
