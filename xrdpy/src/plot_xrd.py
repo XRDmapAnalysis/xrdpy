@@ -128,7 +128,7 @@ class _xrdplot(_GeneratePlots):
         threshold_intensity : float, optional
             The rsm_intensities with intensities lower than the threshold_intensity 
             are discarded. The default is None. If None, this is ignored.
-        mode : ['real_space', 'real_space_calc_omega_by_2theta', 'reciprocal_space'], optional
+        mode : ['real_space', 'reciprocal_space'], optional
             Mode of plot. The default is "real_space".
         xaxis_label : str, optional
             X-axis label text. The default is '2theta'.
@@ -194,10 +194,7 @@ class _xrdplot(_GeneratePlots):
         # Plot as fat band
         if "real_space" in mode:
             self.XX = np.array([np.linspace(start_, end_, num=self.col_n) for start_, end_ in self.XX])
-            if 'calc_omega_by_2theta' in mode:
-                self.YY = np.array([omega_val/self.XX[ii] for ii, omega_val in enumerate(self.YY)])
-            else:
-                self.YY = np.array([[omega_val]*self.col_n for ii, omega_val in enumerate(self.YY)])
+            self.YY = np.array([[omega_val]*self.col_n for ii, omega_val in enumerate(self.YY)])
             ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, cmap=color_map, color_scale=color_scale, 
                                                     vmin=vmin, vmax=vmax)
         elif "reciprocal_space" in mode:
@@ -222,7 +219,7 @@ class _xrdplot(_GeneratePlots):
         else:
             CountFig = self._save_figure(save_file_name, fig=self.fig, CountFig=CountFig, **kwargs_savefig)
             plt.close()
-        return self.fig, ax, CountFig
+        return self.fig, ax, CountFig   
 
     @classmethod
     def _get_color_scale(cls, color_scale, vmin=None, vmax=None):

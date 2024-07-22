@@ -126,7 +126,7 @@ class _xrd_reciprocal(_general_fns):
         return qx, qy
         
     @classmethod
-    def _Qxy(cls, omega, two_theta, col_n, R_val=1, mul_fact=10000):
+    def _Qxy(cls, omega, two_theta, col_n, shift=[0,0], R_val=1, mul_fact=10000):
         '''
         Q_x = R(cos(omega) - cos(2*theta-omega))
         Q_y = R(sin(omega) + sin(2*theta-omega))
@@ -144,19 +144,19 @@ class _xrd_reciprocal(_general_fns):
         
         cos_omega = np.cos(omega_rad)
         cos_2theta_omega = np.cos(two_theta_m_omega_rad)
-        return R_val * (cos_omega - cos_2theta_omega) * mul_fact, R_val * (sin_omega + sin_2theta_omega) * mul_fact
+        return R_val * (cos_omega - cos_2theta_omega) * mul_fact + shift[0], R_val * (sin_omega + sin_2theta_omega) * mul_fact + shift[1]
 
     @classmethod
-    def _calc_alloy_params(cls, t, binary_parameters, shift, mul_fact, alloy_type, str_type, hkl):
+    def _calc_alloy_params(cls, t, binary_parameters, mul_fact, alloy_type, str_type, hkl):
         alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D = \
             _general_fns._alloy_parameters_from_binary(t, binary_parameters, alloy_type=alloy_type, structure_type=str_type)    
-        Qx_, Qy_ = cls._Qxy_theor(alloy_a, alloy_c, mul_fact=mul_fact, shift=shift, hkl=hkl)
+        Qx_, Qy_ = cls._Qxy_theor(alloy_a, alloy_c, mul_fact=mul_fact, hkl=hkl)
         return alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D, Qx_, Qy_
         
     @classmethod
-    def _find_zero_of_function(cls, t, for_point, binary_parameters, shift, mul_fact, alloy_type, str_type, hkl):
+    def _find_zero_of_function(cls, t, for_point, binary_parameters, mul_fact, alloy_type, str_type, hkl):
         alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D, Qx_, Qy_  = \
-            cls._calc_alloy_params(t, binary_parameters, shift, mul_fact, alloy_type, str_type, hkl)    
+            cls._calc_alloy_params(t, binary_parameters, mul_fact, alloy_type, str_type, hkl)    
         return alloy_D*for_point[0] - for_point[1] + Qy_ -  alloy_D*Qx_
         
     def _find_composition_strain_4_point(self, find_results_4_peak, reference_peak, f_args, comp_interval=[0, 1], root_finding_method='brentq',
@@ -165,8 +165,7 @@ class _xrd_reciprocal(_general_fns):
                                    bracket=comp_interval, method=root_finding_method, 
                                    fprime=fprime, fprime2=fprime2, x0=x0, x1=x1, xtol=xtol, rtol=rtol, maxiter=maxiter)
         assert sol.converged, 'Root finding not converged. Try other methods.'
-        _, _, _, _, aaloy_D, x2, y2 = self._calc_alloy_params(sol.root,f_args[0], f_args[1], f_args[2], 
-                                                       f_args[3], f_args[4], f_args[5])
+        _, _, _, _, aaloy_D, x2, y2 = self._calc_alloy_params(sol.root, f_args[0], f_args[1], f_args[2], f_args[3], f_args[4])
         no_strain_point = [x2, y2]
         relaxation, edge_points = _general_fns._cal_strain_relaxation(find_results_4_peak, reference_peak, no_strain_point, aaloy_D)
         if self.log_info is not None:
