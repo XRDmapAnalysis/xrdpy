@@ -10,7 +10,7 @@ setuptools.setup(
      author="Badal Mondal",
      author_email="badalmondal.chembgc@gmail.com",
      maintainer="Pietro Pampili",
-     maintainer_email="badalmondal.chembgc@gmail.com",
+     maintainer_email="pietro.pampili@tyndall.ie",
      description="xrdpy: Python package for 2D X-ray diffraction data analysis",
      long_description=long_description,
      long_description_content_type="text/markdown",

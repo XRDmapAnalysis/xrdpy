@@ -1,7 +1,7 @@
 import numpy as np
-from .src.get_xrd import _general_fns, _xrd_read, _xrd_reciprocal
-from .src.plot_xrd import _xrdplot
-from .BasicFunctions.general_plot_functions import _GeneratePlots
+from .src import _general_fns, _xrd_read, _xrd_reciprocal
+from .src import _xrdplot
+from .BasicFunctions import _GeneratePlots
 
 ### ===========================================================================
 class general_fns(_general_fns):
