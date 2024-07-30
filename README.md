@@ -34,9 +34,9 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
 
 ### 1. Requirements
 ```
-    1. python>=3.10
+    1. python>=3.12
     3. numpy
-    5. scipy>=1.0
+    5. scipy
     7. matplotlib
 ```
 
@@ -117,19 +117,8 @@ Chekout out [version release history here](docs/RELEASE.md) for the full list of
 
 <!-- =========================================================== -->
 ## License
+* [GNU General Public License v3.0](LICENSE)
 
-`xrdpy` is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-`xrdpy` is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with BandUP.  If not, see <http://www.gnu.org/licenses/>.
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->

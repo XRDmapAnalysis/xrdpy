@@ -14,7 +14,7 @@ setuptools.setup(
      description="xrdpy: Python package for 2D X-ray diffraction data analysis",
      long_description=long_description,
      long_description_content_type="text/markdown",
-     install_requires=['numpy', 'scipy>= 1.0', 'matplotlib'],
+     install_requires=['numpy', 'scipy', 'matplotlib'],
      url="https://github.com/XRDmapAnalysis/xrdpy",
      packages=setuptools.find_packages(),
      classifiers=[
