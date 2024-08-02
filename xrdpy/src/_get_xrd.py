@@ -104,7 +104,7 @@ class _xrd_read:
     def _read_xrd_data(self):
         self.lambda_wavelength = self._get_wavelength()
         if self.log_info is not None:
-            print(f'Wavelenth used: {self.lambda_wavelength:.7f}') 
+            print(f'Wavelength used: {self.lambda_wavelength:.7f}') 
         self.two_theta_values = self._get_2Theta()
         self.omega_values = self._get_omega()
         self.rsm_values = self._get_counts() # reciprocal space map intensity or counts

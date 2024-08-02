@@ -18,19 +18,23 @@ class _GeneratePlots:
 
         """
         self.save_figure_folder = save_figure_dir
-        # params = {'figure.figsize': (8, 6),
-        #           'legend.fontsize': 18,
-        #           'axes.labelsize': 24,
-        #           'axes.titlesize': 24,
-        #           'xtick.labelsize':24,
-        #           'xtick.major.width':2,
-        #           'xtick.major.size':5,
-        #           'ytick.labelsize': 24,
-        #           'ytick.major.width':2,
-        #           'ytick.major.size':5,
-        #           'errorbar.capsize':2}
-        # plt.rcParams.update(params)
-        #plt.rc('font', size=24)
+        params = {'figure.figsize': (8, 6),
+                  'legend.fontsize': 18,
+                  'axes.labelsize': 18,
+                  'axes.titlesize': 18,
+                  'xtick.labelsize':18,
+                  'xtick.major.width':2,
+                  'xtick.major.size':5,
+                  'xtick.minor.width':1,
+                  'xtick.minor.size':3,
+                  'ytick.labelsize': 18,
+                  'ytick.major.width':2,
+                  'ytick.major.size':5,
+                  'ytick.minor.width':1,
+                  'ytick.minor.size':3,
+                  'errorbar.capsize':2}
+        plt.rcParams.update(params)
+        plt.rc('font', size=10)
 
     def _save_figure(self,fig_name, fig=None, CountFig=None, **kwargs_savefig):
         if fig is not None:

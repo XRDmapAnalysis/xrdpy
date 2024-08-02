@@ -7,6 +7,10 @@
 ![](imgs/AlN_AlGaN_AlN_real_space.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space.png) | ![](imgs/AlN_AlGaN_AlN_2reciprocal_space.png)
 :-------------------------:|:-------------------------:|:-------------------------:
 AlGaN/AlN HEMT real space XRD | AlGaN/AlN HEMT reciprocal space XRD | AlGaN/AlN HEMT reciprocal space (rescaled) XRD
+
+![](imgs/AlN_AlGaN_AlN_peaks.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space_overlay.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space_overlay2.png)
+:-------------------------:|:-------------------------:|:-------------------------:
+Reciprocal space XRD with peaks | Reciprocal space XRD maps merging | Reciprocal space (rescaled) XRD merging
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
@@ -35,8 +39,8 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
 ### 1. Requirements
 ```
     1. python>=3.12
-    3. numpy
-    5. scipy
+    3. numpy>=1.13
+    5. scipy>=1.26
     7. matplotlib
 ```
 
@@ -109,7 +113,7 @@ __Bibliography file:__ Here is the [bibliography file](docs/REFERENCES.md) for y
 
 <!-- =========================================================== -->
 ## Version release
-__Latest release: v0.0.1__
+__Latest release: v0.0.2__
 
 Chekout out [version release history here](docs/RELEASE.md) for the full list of updates and upgrades.
 
@@ -117,12 +121,15 @@ Chekout out [version release history here](docs/RELEASE.md) for the full list of
 
 <!-- =========================================================== -->
 ## License
-* [GNU General Public License v3.0](LICENSE)
 
+* [GNU General Public License v3.0](LICENSE)
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
 ## Upcoming (TBD)
-1. Implement peak finding algorithm
+1. Generalize reflection direction
+2. Rotation
+3. ZB structure
+4. Quaternary alloy
 <!-- =========================================================== -->
 

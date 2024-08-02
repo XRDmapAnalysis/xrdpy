@@ -1,4 +1,11 @@
-__Latest release: v0.0.1__
+__Latest release: v0.0.2__
+
+__v0.0.2__
+
+* Improved plottings
+* Merge multiple plots after proper scaling
+* Implemented peak detection algorithm
+* Test
 
 __v0.0.1__
 
