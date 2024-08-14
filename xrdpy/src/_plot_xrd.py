@@ -55,56 +55,21 @@ class _xrdplot(_GeneratePlots):
         self.row_n, self.col_n = np.shape(self.ZZ)
 
     @classmethod
-    def _get_data_in_window(cls, full_data, Ymin=None, Ymax=None,  
-                            pad_y_scale:float=0.5, threshold_weight:float=1e-5):
-        """
-        Collect data within the condition and range specified.
-
-        Parameters
-        ----------
-        full_data : ndarray, optional
-            Original rsm intensities. 
-        Ymin : float, optional
-            Minimum in y-scale. The default is None.
-        Ymax : float, optional
-            Maximum in y-scale. The default is None.
-        pad_y_scale: float, optional
-            Add padding of pad_energy_scale to minimum and maximum energy if Emin
-            and Emax are None. The default is 0.5.
-        threshold_weight : float, optional
-            The band centers with band weights lower than the threshhold weights 
-            are put to zero. The default is None. If None, this is ignored.
-            
-         Returns
-         -------
-         Ymin : float, optional
-            Minimum in y-scale. The default is None.
-         Ymax : float, optional
-            Maximum in y-scale. The default is None.
-         result: ndarray
-             Rsm intensities within the range. 
-
-         """
-        # if Ymin is None: Ymin = full_data.min() - pad_y_scale
-        # if Ymax is None: Ymax = full_data.max() + pad_y_scale
-        
-        #pos_right_y_window = (full_data >= Ymin) * (full_data <= Ymax)
-        result = full_data #[pos_right_y_window]
-
-        # Set weights to 1e-3 which are below threshold_weight
+    def _data_curation_threshold(cls, full_data, threshold_weight:float=1e-5):
+        result = full_data.copy()
         if threshold_weight is not None: 
             result[result < threshold_weight] = np.nan
-        return Ymin, Ymax, result
+        return result
 
     def _plot(self, fig=None, ax=None, save_file_name=None, CountFig=None, 
               Xmin=None, Xmax=None, Ymin=None, Ymax=None, 
-              pad_y_scale:float=0.5, threshold_intensity:float=None,  
+              threshold_intensity:float=None,  
               mode:str="real_space", xaxis_label:str=r'2$\mathrm{\theta}$',
-              yaxis_label:str=r'$\omega$ / $2\theta$', title_text=None, marker='o', fatfactor=20, 
-              smear:float=0.05, color='gray', color_map='viridis', color_scale='linear',
-              show_legend:bool=True, show_colorbar:bool=False, colorbar_label:str=None,
+              yaxis_label:str=r'$\omega$ / $2\theta$', title_text=None,  
+              color_map='viridis', color_scale='linear',
+              show_colorbar:bool=False, colorbar_label:str=None,
               vmin=None, vmax=None, show_plot:bool=True, show_contours:bool=False,
-              **kwargs_savefig):
+              savefig:bool=False, **kwargs_savefig):
         """
         Plot of the maps.
 
@@ -124,8 +89,6 @@ class _xrdplot(_GeneratePlots):
             Minimum in Y-scale. The default is None.
         Ymax : float, optional
             Maximum in Y-scale. The default is None.
-        pad_y_scale: float, optional
-            Add padding of pad_y_scale to minimum and maximum. The default is 0.5.
         threshold_intensity : float, optional
             The rsm_intensities with intensities lower than the threshold_intensity 
             are discarded. The default is None. If None, this is ignored.
@@ -135,23 +98,10 @@ class _xrdplot(_GeneratePlots):
             X-axis label text. The default is '2theta'.
         yaxis_label : str, optional
             Y-axis label text. The default is 'omega/2theta'.
-        marker : matplotlib.pyplot markerMarkerStyle, optional
-            The marker style. Marker can be either an instance of the class or 
-            the text shorthand for a particular marker. 
-            The default is 'o'.
-        fatfactor : int, optional
-            Scatter plot marker size. The default is 20.
-        smear : float, optional
-            Gaussian smearing. The default is 0.05.
-        color : str/color, optional
-            Color of plot of unfolded band structure. The color of supercell
-            band structures is gray. The default is 'gray'.
         color_map: str/ matplotlib colormap
             Colormap for density plot. The default is viridis.
         color_scale : str, optional ['log', 'linear']
             The default is 'linear'.
-        show_legend : bool, optional
-            If show legend or not. The default is True.
         show_colorbar : bool, optional
             Plot the colorbar in the figure or not. If fig=None, this is ignored.
             The default is False.
@@ -162,6 +112,8 @@ class _xrdplot(_GeneratePlots):
             By default, the colormap covers the complete value range of the supplied data.
         show_plot : bool, optional
             To show the plot when not saved. The default is True.
+        savefig : bool, optional
+            To save the plot. Ignored when save_file_name is None. The default is True.
         **kwargs_savefig : dict
             The matplotlib keywords for savefig function.
         
@@ -188,9 +140,7 @@ class _xrdplot(_GeneratePlots):
             
         if yaxis_label is None: yaxis_label=''
             
-        Ymin, Ymax, result = self._get_data_in_window(self.ZZ,Ymin=Ymin, Ymax=Ymax,
-                                                      pad_y_scale=pad_y_scale, 
-                                                      threshold_weight=threshold_intensity)
+        result = self._data_curation_threshold(self.ZZ, threshold_weight=threshold_intensity)
         
         # Plot as fat band
         if "real_space" in mode:
@@ -216,22 +166,24 @@ class _xrdplot(_GeneratePlots):
         if title_text is not None: ax.set_title(title_text)
         xx_, yy_ = self._plot_borders()
         ax.plot(xx_, yy_, c='k', ls='--')
-        
-        
-        if Xmin is not None: 
-            ax.set_xlim(xmin=Xmin)
-        if Xmax is not None: 
-            ax.set_xlim(xmax=Xmax)
-        if Ymin is not None: 
-            ax.set_ylim(ymin=Ymin)
-        if Ymax is not None: 
-            ax.set_ylim(ymax=Ymax)
 
+        # set axis limits
+        _xlims = [Xmin, Xmax]
+        _ylims = [Ymin, Ymax]
+        ax.set_xlim(_xlims)
+        ax.set_ylim(_ylims)
+
+        if _xlims.count(None) == len(_xlims):
+            plt.autoscale(axis='x')
+        if _ylims.count(None) == len(_ylims):
+            plt.autoscale(axis='y')
+       
         if save_file_name is None:
             if show_plot: plt.show()
         else:
-            CountFig = self._save_figure(save_file_name, fig=self.fig, CountFig=CountFig, **kwargs_savefig)
-            plt.close()
+            CountFig = self._save_figure(save_file_name, fig=self.fig, 
+                                         savefig=savefig, show_plot=show_plot,
+                                         CountFig=CountFig, **kwargs_savefig)
         return self.fig, ax, CountFig   
 
     def _plot_borders(self):
