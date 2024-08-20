@@ -79,7 +79,7 @@ class xrd(_xrd_read, _xrd_reciprocal, _xrdplot, _PeaksDetection):
             fig, ax, _ = self._plot(fig=None, ax=None, save_file_name=None, CountFig=None,
                                    Xmin=0, Xmax=1, Ymin=None, Ymax=None, threshold_intensity=None,  
                                    mode="simple_2d_plot", xaxis_label=r'composition (t)',
-                                   yaxis_label=r'f$_{opt} (Q^{\prime}_x, Q^{\prime}_y, t, Q^{sub}_x)$', title_text=None,  
+                                   yaxis_label=r'f$_{opt} (Q^{\prime}_x, Q^{\prime}_y, t, f_{qx}, f_{qy})$', title_text=None,
                                    line_color='k', line_style='-', show_plot=True, 
                                    savefig=False, dpi=75)
             ax.axhline(y=0, c='k', ls='--')

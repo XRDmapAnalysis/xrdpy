@@ -155,9 +155,8 @@ class _xrdplot(_GeneratePlots):
         elif "reciprocal_space" in mode:
             ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, cmap=color_map, color_scale=color_scale, 
                                                     vmin=vmin, vmax=vmax, show_contours=show_contours)
-        elif mode == 'simple_2d_plot': # This mode is hidden. Used for specific plots later.
-            return_plot = ax.plot(self.XX, self.YY, color=line_color)
-            pass # This plots the skeleton of the plots without raising error.
+        elif mode == 'simple_2d_plot': 
+            return_plot = ax.plot(self.XX, self.YY, color=line_color, ls=line_style)
         else:
             raise ValueError("Unknownplot mode: '{}'".format(mode))
             

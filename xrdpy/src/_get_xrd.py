@@ -160,5 +160,5 @@ class _xrd_reciprocal(_general_fns):
         if self.log_info is not None:
             print(f'Solution for requested peak/point: {find_results_4_peak}')
             print(f'\t{"-Composition (%)":<25}: {sol.root*100:.2f}')
-            print(f'\t{"-Strain-relaxation (%)":<25}: {relaxation:.2f}')
+            print(f'\t{"-Strain-relaxation (%)":<25}: {relaxation*100:.2f}')
         return sol, relaxation
