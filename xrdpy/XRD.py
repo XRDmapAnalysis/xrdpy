@@ -36,26 +36,20 @@ class xrd(_xrd_read, _xrd_reciprocal, _xrdplot, _PeaksDetection):
                          shift=shift, R_val=R, mul_fact=mul_fact)
 
     @classmethod
-    def Qxy_theor(cls, a, c, mul_fact=10000, shift=[0,0], hkl='105'):
-        return cls._Qxy_theor(a, c, mul_fact=mul_fact, shift=shift, hkl=hkl)
+    def Qxy_theor(cls, a, c, mul_fact=10000, shift=[0,0], hkl=(1,0,5), structure_type='wz'):
+        return cls._Qxy_theor(a, c, mul_fact=mul_fact, shift=shift, hkl=hkl, structure_type=structure_type)
 
-    def get_full_strain_line(self, reference_peak, no_strain_point, D):
-        '''
-        (x1, y1) = reference point
-        (x2, y2) = point on no-strain line
-        No-relaxation (fully strained) line: considering elastic relaxation
-        Deformation potential = D 
-        ==> point on full-strain line = (x1, y2+D(x1-x2))
-        '''
-        return self._calculate_full_strain_line(reference_peak, no_strain_point, D)
+    @classmethod
+    def get_full_strain_line(cls, Qxs, composition, binary_parameters, mul_fact, alloy_type, str_type, hkl):
+        return cls._calculate_full_strain_line(Qxs, composition, binary_parameters, mul_fact, alloy_type, str_type, hkl)
 
     def xrd_plot(self, save_figure_dir='.', fig=None, ax=None, save_file_name=None,  
                  CountFig=None, Xmin=None, Xmax=None, Ymin=None, Ymax=None, 
                  threshold_intensity:float=None, mode:str="real_space", 
                  xaxis_label:str=r'2$\mathrm{\theta}$',
-                 yaxis_label:str=r'$\omega$ / $2\theta$',  
-                 title_text:str=None, color_map='jet', color_scale='linear', 
-                 vmin=None, vmax=None, show_colorbar:bool=True,   
+                 yaxis_label:str=r'$\omega$ / $2\theta$', title_text:str=None, 
+                 color_map='jet', color_scale='linear', line_color='k',
+                 line_style='--', vmin=None, vmax=None, show_colorbar:bool=True,   
                  colorbar_label:str=None, show_plot:bool=True,  
                  savefig:bool=False, **kwargs_savefig):
         
@@ -64,7 +58,8 @@ class xrd(_xrd_read, _xrd_reciprocal, _xrdplot, _PeaksDetection):
                           CountFig=CountFig, Xmin=Xmin, Xmax=Xmax, Ymin=Ymin, Ymax=Ymax, 
                           threshold_intensity=threshold_intensity, mode=mode, 
                           xaxis_label=xaxis_label, yaxis_label=yaxis_label, 
-                          title_text=title_text, color_scale=color_scale, 
+                          title_text=title_text, color_scale=color_scale,
+                          line_color=line_color, line_style=line_style,
                           color_map=color_map, show_colorbar=show_colorbar, 
                           colorbar_label=colorbar_label, vmin=vmin, vmax=vmax, 
                           show_plot=show_plot, savefig=savefig, 
@@ -73,13 +68,27 @@ class xrd(_xrd_read, _xrd_reciprocal, _xrdplot, _PeaksDetection):
     def find_composition_strain_4_point(self, find_results_4_peak, reference_peak, optimize_f_args, 
                                         comp_interval=[0, 1], root_finding_method='brentq',
                                         fprime=None, fprime2=None, x0=None, x1=None, xtol=None, 
-                                        rtol=None, maxiter=None):
+                                        rtol=None, maxiter=None, show_optimization_fn:bool=False):
         _xrd_reciprocal.__init__(self, log_info=self.print_log)
+        
+        if show_optimization_fn:
+            Qxs = np.linspace(0, 1, 11)
+            Qys = self._find_zero_of_function(Qxs, find_results_4_peak, *optimize_f_args)
+            _xrdplot.__init__(self, save_figure_dir='.', x_values=Qxs, 
+                              y_values=Qys, z_values=[[None]])
+            fig, ax, _ = self._plot(fig=None, ax=None, save_file_name=None, CountFig=None,
+                                   Xmin=0, Xmax=1, Ymin=None, Ymax=None, threshold_intensity=None,  
+                                   mode="simple_2d_plot", xaxis_label=r'composition (t)',
+                                   yaxis_label=r'f$_{opt} (Q^{\prime}_x, Q^{\prime}_y, t, Q^{sub}_x)$', title_text=None,  
+                                   line_color='k', line_style='-', show_plot=True, 
+                                   savefig=False, dpi=75)
+            ax.axhline(y=0, c='k', ls='--')
         return self._find_composition_strain_4_point(find_results_4_peak, reference_peak, optimize_f_args, 
                                                      comp_interval=comp_interval,
                                                      root_finding_method=root_finding_method,
                                                      fprime=fprime, fprime2=fprime2, x0=x0, x1=x1,
                                                      xtol=xtol, rtol=rtol, maxiter=maxiter)
+        
 
     def find_peaks(self, x_values, y_values, z_values,
                    apply_filter:bool=False, threshold:float=None, 
@@ -100,10 +109,10 @@ class plottings(_xrdplot, _GeneratePlots):
                  Xmin=None, Xmax=None, Ymin=None, Ymax=None,
                  threshold_intensity:float=None, mode:str="real_space", 
                  xaxis_label:str=r'2$\mathrm{\theta}$',
-                 yaxis_label:str=r'$\omega$ / $2\theta$',  
-                 title_text:str=None, color_map='jet', color_scale='linear',
-                 show_colorbar:bool=True, colorbar_label:str=None, vmin=None, 
-                 vmax=None, show_plot:bool=True, savefig:bool=False, 
+                 yaxis_label:str=r'$\omega$ / $2\theta$', title_text:str=None, 
+                 color_map='jet', color_scale='linear', line_color='k',
+                 line_style='--', show_colorbar:bool=True, colorbar_label:str=None,  
+                 vmin=None, vmax=None, show_plot:bool=True, savefig:bool=False, 
                  show_contours:bool=False, **kwargs_savefig):
         
         _xrdplot.__init__(self, save_figure_dir=self.save_fig_dir, x_values=x_values, 
@@ -113,8 +122,10 @@ class plottings(_xrdplot, _GeneratePlots):
                           threshold_intensity=threshold_intensity, mode=mode, 
                           xaxis_label=xaxis_label, yaxis_label=yaxis_label, 
                           title_text=title_text, color_scale=color_scale, 
-                          color_map=color_map, show_colorbar=show_colorbar, colorbar_label=colorbar_label,
-                          vmin=vmin, vmax=vmax, show_plot=show_plot, show_contours=show_contours,
+                          line_color=line_color, line_style=line_style,
+                          color_map=color_map, show_colorbar=show_colorbar, 
+                          colorbar_label=colorbar_label, vmin=vmin, vmax=vmax, 
+                          show_plot=show_plot, show_contours=show_contours,
                           savefig=savefig, **kwargs_savefig)
 
     def save_figure(self,fig_name, fig=None, savefig:bool=True, show_plot:bool=True, 

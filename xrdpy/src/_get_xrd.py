@@ -27,14 +27,14 @@ class _general_fns:
                 for what2extrapolate in list2Dwhat2extrapolate)
 
     @staticmethod
-    def _wz_elastic_deform_potential(c13, c33):
-        # Deformation potential = -2C13/C33
+    def _wz_elastic_distortion_coefficient(c13, c33):
+        # Distortion coefficient = -2C13/C33
         return -2*c13/c33
         
     @classmethod
-    def _find_deformation_potential(cls, c13, c33, str_typ='wz'):
+    def _find_distortion_coefficient(cls, c13, c33, str_typ='wz'):
         if str_typ == 'wz':
-            return _general_fns._wz_elastic_deform_potential(c13, c33)
+            return _general_fns._wz_elastic_distortion_coefficient(c13, c33)
         else:
             raise ValueError('Structure type not implemented.')
 
@@ -43,33 +43,13 @@ class _general_fns:
         if alloy_type == 'ternary':
             if structure_type == 'wz':
                 alloy_a, alloy_c, alloy_C13, alloy_C33 = cls._ternary_alloy_params(t, list2Dwhat2extrapolate)  
-                alloy_D = cls._find_deformation_potential(alloy_C13, alloy_C33, str_typ=structure_type) 
+                alloy_D = cls._find_distortion_coefficient(alloy_C13, alloy_C33, str_typ=structure_type) 
                 return alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D
             else:
                 raise ValueError("Other structure types are not implemented yet. Allowed types 'wz'.")
         else:
             raise ValueError("Other alloy types are not implemented yet. Allowed types 'ternary'.")
         return 
-
-    @classmethod
-    def _calculate_full_strain_line(cls, reference_peak, no_strain_point, D):
-        '''
-        (x1, y1) = reference point
-        (x2, y2) = point on no-strain line
-        No-relaxation (fully strained) line: considering elastic relaxation
-        Deformation potential = D 
-        ==> point on full-strain line = (x1, y2+D(x1-x2))
-        '''
-        return [reference_peak[0], no_strain_point[1] + D*(reference_peak[0]-no_strain_point[0])]
-
-    @classmethod
-    def _cal_strain_relaxation(cls, find_results_4_peak, reference_peak, no_strain_point, alloy_D):
-        full_strain_peak = cls._calculate_full_strain_line(reference_peak, no_strain_point, alloy_D)
-        #calculate distances from full_strain peak
-        distances = np.array([cls._distance_calculator(full_strain_peak, pp) for pp in [find_results_4_peak, no_strain_point]])
-        distances[distances<1e-6] == 1e-6 
-        relaxation = distances[0]/distances[1] *100
-        return relaxation, np.array([no_strain_point, full_strain_peak])
         
 class _xrd_read:
     def __init__(self, data_fname='./test.xml', log_info=None):
@@ -117,12 +97,13 @@ class _xrd_reciprocal(_general_fns):
         self.log_info = log_info
 
     @classmethod
-    def _Qxy_theor(cls, a, c, mul_fact=10000, shift=[0,0], hkl='105'):
-        if hkl=='105':
-            qx_factor, qy_factor = 2/np.sqrt(3)/a, 5/c
+    def _Qxy_theor(cls, a, c, mul_fact=10000, shift=[0,0], hkl=(1,0,5), structure_type:str='wz'):
+        if structure_type == 'wz':
+            qx_factor = 1.1547005383792517 * (hkl[0]*hkl[0] + hkl[1]*hkl[1] + hkl[0]*hkl[1]) # = 2/sqrt(3) * (h^2 + k^2 + h*k)
+            qy_factor = hkl[2] # =l
         else:
-            raise ValueError("Other hkl directions are not implemented yet. Allowed directions '105'.")
-        qx, qy = qx_factor*mul_fact + shift[0], qy_factor*mul_fact + shift[1]
+            raise ValueError("Other structure types are not implemented yet. Allowed types 'wz'.")
+        qx, qy = qx_factor/a*mul_fact + shift[0], qy_factor/c*mul_fact + shift[1]
         return qx, qy
         
     @classmethod
@@ -147,29 +128,37 @@ class _xrd_reciprocal(_general_fns):
         return R_val * (cos_omega - cos_2theta_omega) * mul_fact + shift[0], R_val * (sin_omega + sin_2theta_omega) * mul_fact + shift[1]
 
     @classmethod
+    def _calculate_full_strain_line(cls, Qxs, composition, binary_parameters, mul_fact, alloy_type, str_type, hkl):
+        alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D, Qx_, Qy_  = \
+            cls._calc_alloy_params(composition, binary_parameters, mul_fact, alloy_type, str_type, hkl)   
+        F_fact, G_fact = alloy_D * Qx_ / Qy_, (1. - alloy_D) / Qy_
+        return Qxs / (F_fact + Qxs * G_fact)
+
+    @classmethod
     def _calc_alloy_params(cls, t, binary_parameters, mul_fact, alloy_type, str_type, hkl):
         alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D = \
             _general_fns._alloy_parameters_from_binary(t, binary_parameters, alloy_type=alloy_type, structure_type=str_type)    
-        Qx_, Qy_ = cls._Qxy_theor(alloy_a, alloy_c, mul_fact=mul_fact, hkl=hkl)
+        Qx_, Qy_ = cls._Qxy_theor(alloy_a, alloy_c, mul_fact=mul_fact, hkl=hkl, structure_type=str_type)
         return alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D, Qx_, Qy_
         
     @classmethod
     def _find_zero_of_function(cls, t, for_point, binary_parameters, mul_fact, alloy_type, str_type, hkl):
         alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D, Qx_, Qy_  = \
-            cls._calc_alloy_params(t, binary_parameters, mul_fact, alloy_type, str_type, hkl)    
-        return alloy_D*for_point[0] - for_point[1] + Qy_ -  alloy_D*Qx_
+            cls._calc_alloy_params(t, binary_parameters, mul_fact, alloy_type, str_type, hkl)   
+        F_fact, G_fact = alloy_D * Qx_ / Qy_, (1. - alloy_D) / Qy_
+        return for_point[1] * (F_fact + for_point[0] * G_fact) - for_point[0] 
         
-    def _find_composition_strain_4_point(self, find_results_4_peak, reference_peak, f_args, comp_interval=[0, 1], root_finding_method='brentq',
-                                         fprime=None, fprime2=None, x0=None, x1=None, xtol=None, rtol=None, maxiter=None):
+    def _find_composition_strain_4_point(self, find_results_4_peak, reference_peak, f_args, comp_interval=[0, 1], 
+                                         root_finding_method='brentq', fprime=None, fprime2=None, 
+                                         x0=None, x1=None, xtol=None, rtol=None, maxiter=None):
         sol = optimize.root_scalar(self._find_zero_of_function, args=((find_results_4_peak,) + f_args), 
                                    bracket=comp_interval, method=root_finding_method, 
                                    fprime=fprime, fprime2=fprime2, x0=x0, x1=x1, xtol=xtol, rtol=rtol, maxiter=maxiter)
         assert sol.converged, 'Root finding not converged. Try other methods.'
-        _, _, _, _, aaloy_D, x2, y2 = self._calc_alloy_params(sol.root, f_args[0], f_args[1], f_args[2], f_args[3], f_args[4])
-        no_strain_point = [x2, y2]
-        relaxation, edge_points = _general_fns._cal_strain_relaxation(find_results_4_peak, reference_peak, no_strain_point, aaloy_D)
+        _, _, _, _, _, Qx2, _ = self._calc_alloy_params(sol.root, f_args[0], f_args[1], f_args[2], f_args[3], f_args[4])
+        relaxation = (1 - reference_peak[0]/find_results_4_peak[0]) / (1 - reference_peak[0]/Qx2)
         if self.log_info is not None:
             print(f'Solution for requested peak/point: {find_results_4_peak}')
-            print(f'\t{"-Composition (%):":<25} {sol.root*100:.2f}')
-            print(f'\t{"-Strain-relaxation (%):":<25} {relaxation:.2f}')
-        return sol, relaxation, edge_points
+            print(f'\t{"-Composition (%)":<25}: {sol.root*100:.2f}')
+            print(f'\t{"-Strain-relaxation (%)":<25}: {relaxation:.2f}')
+        return sol, relaxation

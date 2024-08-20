@@ -1,4 +1,8 @@
-__Latest release: v0.0.2__
+__Latest release: v0.0.3__
+
+__v0.0.3__
+
+* Bug fix in Qx-Qy relation
 
 __v0.0.2__
 

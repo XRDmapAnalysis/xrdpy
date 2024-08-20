@@ -66,8 +66,8 @@ class _xrdplot(_GeneratePlots):
               threshold_intensity:float=None,  
               mode:str="real_space", xaxis_label:str=r'2$\mathrm{\theta}$',
               yaxis_label:str=r'$\omega$ / $2\theta$', title_text=None,  
-              color_map='viridis', color_scale='linear',
-              show_colorbar:bool=False, colorbar_label:str=None,
+              color_map='viridis', color_scale='linear', line_color='k',
+              line_style='--', show_colorbar:bool=False, colorbar_label:str=None,
               vmin=None, vmax=None, show_plot:bool=True, show_contours:bool=False,
               savefig:bool=False, **kwargs_savefig):
         """
@@ -92,7 +92,7 @@ class _xrdplot(_GeneratePlots):
         threshold_intensity : float, optional
             The rsm_intensities with intensities lower than the threshold_intensity 
             are discarded. The default is None. If None, this is ignored.
-        mode : ['real_space', 'reciprocal_space'], optional
+        mode : ['real_space', 'reciprocal_space', 'simple_2d_plot'], optional
             Mode of plot. The default is "real_space".
         xaxis_label : str, optional
             X-axis label text. The default is '2theta'.
@@ -102,6 +102,10 @@ class _xrdplot(_GeneratePlots):
             Colormap for density plot. The default is viridis.
         color_scale : str, optional ['log', 'linear']
             The default is 'linear'.
+        line_color : matplotlib color, optional
+            Color of border lines or for 2d line plots. The default is 'k'.
+        line_style : matplotlib line style, optional
+            Line style of border line or 2d line. The defult is '--'.
         show_colorbar : bool, optional
             Plot the colorbar in the figure or not. If fig=None, this is ignored.
             The default is False.
@@ -151,7 +155,8 @@ class _xrdplot(_GeneratePlots):
         elif "reciprocal_space" in mode:
             ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, cmap=color_map, color_scale=color_scale, 
                                                     vmin=vmin, vmax=vmax, show_contours=show_contours)
-        elif mode == 'only_for_all_scf': # This mode is hidden. Used for specific plots later.
+        elif mode == 'simple_2d_plot': # This mode is hidden. Used for specific plots later.
+            return_plot = ax.plot(self.XX, self.YY, color=line_color)
             pass # This plots the skeleton of the plots without raising error.
         else:
             raise ValueError("Unknownplot mode: '{}'".format(mode))
@@ -164,8 +169,10 @@ class _xrdplot(_GeneratePlots):
         ax.set_ylabel(yaxis_label)
         ax.set_xlabel(xaxis_label)
         if title_text is not None: ax.set_title(title_text)
-        xx_, yy_ = self._plot_borders()
-        ax.plot(xx_, yy_, c='k', ls='--')
+        
+        if mode in ["real_space", "reciprocal_space"]:
+            xx_, yy_ = self._plot_borders()
+            ax.plot(xx_, yy_, c=line_color, ls=line_style)
 
         # set axis limits
         _xlims = [Xmin, Xmax]
