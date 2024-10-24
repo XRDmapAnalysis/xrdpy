@@ -27,16 +27,16 @@ class xrd(_xrd_read, _xrd_reciprocal, _xrdplot, _PeaksDetection):
         return self._read_xrd_data()
 
     def Qxy(self, omega=None, two_theta=None, total_two_theta_in_row=2, 
-            xrd_file_name='./test.xml', shift=[0,0], R=1, mul_fact=10000):
+            xrd_file_name='./test.xml', shift=[0,0], R=1, mul_fact=[10000,10000]):
         _xrd_reciprocal.__init__(self, log_info=self.print_log)
         if omega is None or two_theta is None:
             _, two_theta, omega, _ = self.xrd_read_data(xrd_file_name)
             total_two_theta_in_row = np.shape(self.rsm_intesity)[1]
-        return self._Qxy(omega, two_theta, total_two_theta_in_row, 
-                         shift=shift, R_val=R, mul_fact=mul_fact)
+        return self._Qxy_xrd(omega, two_theta, total_two_theta_in_row,
+                             shift=shift, R_val=R, mul_fact=mul_fact)
 
     @classmethod
-    def Qxy_theor(cls, a, c, mul_fact=10000, shift=[0,0], hkl=(1,0,5), structure_type='wz'):
+    def Qxy_theor(cls, a, c, mul_fact=[10000,10000], shift=[0,0], hkl=(1,0,5), structure_type='wz'):
         return cls._Qxy_theor(a, c, mul_fact=mul_fact, shift=shift, hkl=hkl, structure_type=structure_type)
 
     @classmethod

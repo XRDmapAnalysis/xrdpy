@@ -101,7 +101,7 @@ If you use `xrdpy` in your work, please:
 
   * **State EXPLICITLY that you have used the xrdpy code** (or a modified version of it, if this is the case), for instance, adding a sentence like:
 
-         "The XRD analysis has been performed using the xrdpy code"
+         "The XRD analysis is performed using the xrdpy code"
 
   * **Read and cite the following papers** (and the appropriate references therein):
     
@@ -127,9 +127,8 @@ Chekout out [version release history here](docs/RELEASE.md) for the full list of
 
 <!-- =========================================================== -->
 ## Upcoming (TBD)
-1. Generalize reflection direction
-2. Rotation
-3. ZB structure
-4. Quaternary alloy
+1. Rotation
+2. ZB structure
+3. Quaternary alloy
 <!-- =========================================================== -->
 
