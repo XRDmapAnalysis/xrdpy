@@ -77,14 +77,29 @@ class _xrd_read:
         omega_tags = self.xml_root.findall(".//ns:xrdMeasurement/ns:scan/ns:dataPoints/ns:positions/[@axis='Omega']/ns:commonPosition", self.namespaces) 
         return np.array([omega_tag.text for omega_tag in omega_tags], dtype=float)
 
+    def _assert_same_units(self, for_xml_tags, error_text=''):
+        _unit_found = list(set([for_xml_tag.attrib['unit'] for for_xml_tag in for_xml_tags]))
+        assert len(_unit_found) == 1, f'{error_text}: {_unit_found}'
+        return _unit_found[0]
+
+    def _get_scan_time(self):
+        count_time_tags = self.xml_root.findall('.//ns:xrdMeasurement/ns:scan/ns:dataPoints/ns:commonCountingTime', self.namespaces)
+        _unit_found = self._assert_same_units(count_time_tags, error_text='Multiple units found for commonCountingTime')
+        return np.array([count_time.text.split() for count_time in count_time_tags], dtype=float), _unit_found
+
     def _get_counts(self):
         count_tags = self.xml_root.findall('.//ns:xrdMeasurement/ns:scan/ns:dataPoints/ns:counts', self.namespaces)
-        return np.array([count_line.text.split() for count_line in count_tags], dtype=float)
+        scan_time_values, time_unit_found = self._get_scan_time()
+        count_unit_found = self._assert_same_units(count_tags, error_text='Multiple units found for counts')
+        if self.log_info is not None:
+            print(f'Intensity unit (from xrd file): {count_unit_found}/{time_unit_found}')
+        read_intensity_values = np.array([count_line.text.split() for count_line in count_tags], dtype=float)
+        return read_intensity_values/scan_time_values
 
     def _read_xrd_data(self):
         self.lambda_wavelength = self._get_wavelength()
         if self.log_info is not None:
-            print(f'Wavelength used: {self.lambda_wavelength:.7f}') 
+            print(f'Wavelength used (from xrd file): {self.lambda_wavelength:.7f}') 
         self.two_theta_values = self._get_2Theta()
         self.omega_values = self._get_omega()
         self.rsm_values = self._get_counts() # reciprocal space map intensity or counts
@@ -202,7 +217,7 @@ class _xrd_reciprocal(_general_fns):
         return alloy_D, Qx_theor, Qy_theor
     
     @classmethod
-    def _calculate_FG_factors(alloy_D, Qx, Qy):
+    def _calculate_FG_factors(cls, alloy_D, Qx, Qy):
         # F_fact, G_fact = alloy_D * Qx / Qy, (1. - alloy_D) / Qy
         return alloy_D * Qx / Qy, (1. - alloy_D) / Qy
     
