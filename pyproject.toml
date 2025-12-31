@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "xrdpy"
+dynamic = ["version"]
+dependencies = [
+    'numpy', 
+    'scipy>=1.0',
+    'matplotlib'
+]
+requires-python = ">=3.12"
+authors = [
+    { name = "Badal Mondal", email = "badalmondal.chembgc@gmail.com" },
+]
+maintainers = [
+  {name = "Badal Mondal", email = "badalmondal.chembgc@gmail.com" },
+]
+description = "xrdpy: Python package for 2D X-ray diffraction data analysis"
+readme = "README.md"
+license = "GPL-3.0-only"
+license-files = ["LICEN[CS]E*"]
+keywords = ["2D xrd", "XRD"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/XRDmapAnalysis/xrdpy/wiki"
+Documentation = "https://github.com/XRDmapAnalysis/xrdpy/wiki/01.-Package-documentation"
+Repository = "https://github.com/XRDmapAnalysis/xrdpy.git"
+Issues = "https://github.com/XRDmapAnalysis/xrdpy/issues"
+Changelog = "https://github.com/XRDmapAnalysis/xrdpy/wiki/04.-Release-history"
+Releasenotes = "https://github.com/XRDmapAnalysis/xrdpy/releases"
+
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["xrdpy*", "xrdpy.*"]
+exclude = ["tests", "imgs", "docs", "tutorials"]
+namespaces = false
+
+#[tool.setuptools]
+#include-package-data = false
+
+#[tool.setuptools.package-data]
+#mobilitypy = ["imgs/*.png"]
+
+[tool.setuptools_scm]
+version_file = "xrdpy/_version.py"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q"
+testpaths = ["tests"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "pytest-cov>=4.1"]

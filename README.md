@@ -4,11 +4,11 @@
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
-![](imgs/AlN_AlGaN_AlN_real_space.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space.png) | ![](imgs/AlN_AlGaN_AlN_2reciprocal_space.png)
+![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_real_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_2reciprocal_space.png)
 :-------------------------:|:-------------------------:|:-------------------------:
 AlGaN/AlN HEMT real space XRD | AlGaN/AlN HEMT reciprocal space XRD | AlGaN/AlN HEMT reciprocal space (rescaled) XRD
 
-![](imgs/AlN_AlGaN_AlN_peaks.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space_overlay.png) | ![](imgs/AlN_AlGaN_AlN_reciprocal_space_overlay2.png)
+![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_peaks.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space_overlay.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space_overlay2.png)
 :-------------------------:|:-------------------------:|:-------------------------:
 Reciprocal space XRD with peaks | Reciprocal space XRD maps merging | Reciprocal space (rescaled) XRD merging
 <!-- =========================================================== -->
@@ -44,6 +44,12 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
     7. matplotlib
 ```
 
+### 3. Installation using `pip` [*recommended] [*coming soon]
+
+```
+    pip install xrdpy
+```
+
 ### 2. Installation from github repository
 
 ```
@@ -51,46 +57,33 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
     cd xrdpy
     pip install .  
 ```
-Or, without cloning
+Or,
 ```
-    pip install git+https://github.com/XRDmapAnalysis/xrdpy.git #@specific_branch
+    pip install git+https://github.com/XRDmapAnalysis/xrdpy.git@specific_branch
 ```
 
-### 3. Installation using `pip` [* not available yet]
 
-```
-    pip install xrdpy
-```
 
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
 ## Usage
-__Documentation__: [here](docs/USAGE.md)
+## Usage
+__Wiki page__: [Welcome to xrdpy](https://github.com/XRDmapAnalysis/xrdpy/wiki)
 
-The detailed documentation is available [here](docs/USAGE.md). Explore the [tutorial](tests) folder for example tutorials. Below are quick snippets showcasing what you can achieve with `xrdpy`:
-```
-xrdpy package:
-    1. general_fns class
-        1.1 alloy_parameters_from_binary()
-    1. xrd class
-        1.1 xrd_read_data()
-        1.2 find_composition_strain_4_point()
-        1.3 get_full_strain_line()
-        1.4 Qxy()
-        1.5 Qxy_theor()
-        1.6 xrd_plot()
-    3. plottings class
-        3.1 xrd_plot()
-        3.2 save_figure()
-```
+__Documentation__: [Package documentation](https://github.com/XRDmapAnalysis/xrdpy/wiki/01.-Package-documentation)
+
+__Discussions__: [Discuss more about the package here](https://github.com/XRDmapAnalysis/xrdpy/discussions)
+
+__Tutorials__: [tutorial](https://github.com/XRDmapAnalysis/xrdpy/tree/main/tutorials)
+
 
 <!-- =========================================================== -->
 ## Tips and tricks:
 
-__FAQs__: [here](docs/FAQs.md)
+__FAQs__: [here](https://github.com/XRDmapAnalysis/xrdpy/wiki/02.-Frequently-asked-questions-(FAQs))
 
-You can find a list of common user issues encountered while using this software [here](docs/FAQs.md). We appreciate and respect our users' views and are committed to providing the best experience possible. Your feedback is highly valued.
+You can find a list of common user issues encountered while using this software [here](https://github.com/XRDmapAnalysis/xrdpy/wiki/02.-Frequently-asked-questions-(FAQs)). We appreciate and respect our users' views and are committed to providing the best experience possible. Your feedback is highly valued.
 
 <!-- =========================================================== -->
 
@@ -107,22 +100,21 @@ If you use `xrdpy` in your work, please:
     
 >> 1.
 
-__Bibliography file:__ Here is the [bibliography file](docs/REFERENCES.md) for your convenience.
+__Bibliography file:__ Here is the [bibliography file](https://github.com/XRDmapAnalysis/xrdpy/wiki/03.-References-(bibliography-style)) for your convenience.
 
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
 ## Version release
-__Latest release: v0.0.3__
 
-Chekout out [version release history here](docs/RELEASE.md) for the full list of updates and upgrades.
+Chekout out [version release history here](https://github.com/XRDmapAnalysis/xrdpy/wiki/04.-Release-history) for the full list of updates and upgrades.
 
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
 ## License
 
-* [GNU General Public License v3.0](LICENSE)
+* [GNU General Public License v3.0](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/LICENSE)
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
