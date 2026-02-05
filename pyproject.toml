@@ -23,7 +23,7 @@ license = "GPL-3.0-only"
 license-files = ["LICEN[CS]E*"]
 keywords = ["2D xrd", "XRD"]
 classifiers = [
-  "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Programming Language :: Python :: 3",
   "Operating System :: OS Independent",
 ]
