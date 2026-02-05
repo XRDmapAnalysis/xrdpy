@@ -1,60 +1,44 @@
 import xml.etree.ElementTree as ET
 import numpy as np
-from scipy import optimize
 from ..BasicFunctions.constants_ import wave_lenth_dict, degree2radian
 
 ### ===========================================================================
-class _general_fns:
-    def __init__(self, print_log=None):
-        if print_log is not None:
-            print_log = print_log.lower()
-        self.print_log = print_log
+class _xrd_read_file:
+    def __init__(self, xrd_scan_mode:str='omega_2theta_scan', 
+                 read_file_mode:str="reciprocal_space_map", data_fname='./test', 
+                 data_file_fmt:str = 'xrdml', log_info=None):
+        """
+        Initialize function for this class.
 
-    @staticmethod
-    def _distance_calculator(p1, p2):
-        return np.sqrt((p1[0]-p2[0])**2 + (p1[1]-p1[1])**2)
-        
-    @staticmethod
-    def _ternary_extrapolation(x, a_bin, b_bin, bowing:float=0):
-        return a_bin * x + b_bin * (1.0 - x) + bowing * x * (1-x)
+        Parameters
+        ----------           
+        data_fname : str or file object
+            The file name. The default is './test'.
+        data_file_fmt : str, optional [options: 'xrdml']
+            Format for the xrd file to be read. Different file formats will be
+            parsed differently. Contact developer to add support for other file
+            formats. The default is 'xrdml'.
+        log_info : TYPE, optional
+            Level of logging. The default is None.
 
-    @classmethod
-    def _ternary_alloy_params(cls, t, list2Dwhat2extrapolate):
-        '''
-        list2Dwhat2extrapolate: [[a_lattice_parameter bin_1, a_lattice_parameter bin_2, bowing], ...]
-        '''
-        return (_general_fns._ternary_extrapolation(t, what2extrapolate[0], what2extrapolate[1], bowing=what2extrapolate[2]) 
-                for what2extrapolate in list2Dwhat2extrapolate)
+        Raises
+        ------
+        RuntimeError
+            If data_file_fmt is not supported.
 
-    @staticmethod
-    def _wz_elastic_distortion_coefficient(c13, c33):
-        # Distortion coefficient = -2C13/C33
-        return -2*c13/c33
-        
-    @classmethod
-    def _find_distortion_coefficient(cls, c13, c33, str_typ='wz'):
-        if str_typ == 'wz':
-            return _general_fns._wz_elastic_distortion_coefficient(c13, c33)
-        else:
-            raise ValueError("Structure type is not implemented yet. Allowed types 'wz'.")
+        Returns
+        -------
+        None.
 
-    @classmethod 
-    def _alloy_parameters_from_binary(cls, t, list2Dwhat2extrapolate, alloy_type='ternary', structure_type='wz'):
-        if alloy_type == 'ternary':
-            if structure_type == 'wz':
-                alloy_a, alloy_c, alloy_C13, alloy_C33 = cls._ternary_alloy_params(t, list2Dwhat2extrapolate)  
-                alloy_D = cls._find_distortion_coefficient(alloy_C13, alloy_C33, str_typ=structure_type) 
-                return alloy_a, alloy_c, alloy_C13, alloy_C33, alloy_D
-            else:
-                raise ValueError("Other structure types are not implemented yet. Allowed types 'wz'.")
-        else:
-            raise ValueError("Other alloy types are not implemented yet. Allowed types 'ternary'.")
-        return 
-        
-class _xrd_read:
-    def __init__(self, data_fname='./test.xml', log_info=None):
+        """
+        if data_file_fmt not in ['xrdml']:
+            raise RuntimeError(f'.{data_file_fmt} xrd file format is not supported yet. Contact developer.')
+        if xrd_scan_mode not in ['omega_2theta_scan']:
+            raise RuntimeError(f'.{xrd_scan_mode} xrd file scan mode is not supported yet. Contact developer.')
+        self._xrd_scan_mode = xrd_scan_mode
+        self._read_file_mode = read_file_mode
         # Parse the XML file
-        self.xml_root = ET.parse(data_fname).getroot()
+        self.xml_root = ET.parse(f'{data_fname}.{data_file_fmt}').getroot()
         # get XML namespaces
         self.namespaces = {'ns': self.xml_root.tag.split('}')[0].split('{')[1]}
         if log_info is not None:
@@ -96,156 +80,77 @@ class _xrd_read:
         read_intensity_values = np.array([count_line.text.split() for count_line in count_tags], dtype=float)
         return read_intensity_values/scan_time_values
 
-    def _read_xrd_data(self):
+    def _read_xrd_data_from_file(self, shift=[0,0], mul_fact=[1,1]):
         self.lambda_wavelength = self._get_wavelength()
         if self.log_info is not None:
             print(f'Wavelength used (from xrd file): {self.lambda_wavelength:.7f}') 
-        self.two_theta_values = self._get_2Theta()
-        self.omega_values = self._get_omega()
-        self.rsm_values = self._get_counts() # reciprocal space map intensity or counts
-        return self.lambda_wavelength, self.two_theta_values, self.omega_values, self.rsm_values
-
-class _xrd_reciprocal(_general_fns):
-    def __init__(self, log_info=None):
-        if log_info is not None:
-            log_info = log_info.lower()
-        self.log_info = log_info
-
-    @classmethod
-    def _Qxy_theor(cls, a, c, mul_fact=[10000,10000], shift=[0,0], hkl=(1,0,5), structure_type:str='wz'):
-        '''
-        Definitions of Q_x and Q_y:
-            Q_x_theor = qx_factor(str,hkl) / a_lattice_params_alloy(composition)
-            Q_y_theor = qy_factor(str,hkl) / c_lattice_params_alloy(composition)
+        self.intensity_values = self._get_counts() # map intensity or counts
+        col_n = np.shape(self.intensity_values)[1]
+        if self._xrd_scan_mode == 'omega_2theta_scan':
+            XX = np.array([np.linspace(start_, end_, num=col_n) 
+                           for start_, end_ in self._get_2Theta()])
+            YY = np.array([[omega_val]*col_n for omega_val in self._get_omega()])
         
-        Often Q_x and Q_y are rescalled by some factor, mul_fact:
-            Q_x_theor = Q_x_theor * mul_fact[0]
-            Q_y_theor = Q_y_theor * mul_fact[1]
-            
-        If needed the Q_x and Q_y values can be shifted along respective axes:
-            Q_x_theor = Q_x_theor + shift[0]
-            Q_y_theor = Q_y_theor + shift[1]
-
-        Parameters
-        ----------
-        a : TYPE
-            DESCRIPTION.
-        c : TYPE
-            DESCRIPTION.
-        mul_fact : TYPE, optional
-            DESCRIPTION. The default is [10000,10000].
-        shift : TYPE, optional
-            DESCRIPTION. The default is [0,0].
-        hkl : TYPE, optional
-            DESCRIPTION. The default is (1,0,5).
-        structure_type : str, optional
-            DESCRIPTION. The default is 'wz'.
-
-        Raises
-        ------
-        ValueError
-            DESCRIPTION.
-
-        Returns
-        -------
-        Q_x_theor : TYPE
-            DESCRIPTION.
-        Q_y_theor : TYPE
-            DESCRIPTION.
-
-        '''
-        if structure_type == 'wz':
-            # qx_factor = 2/sqrt(3) * (h^2 + k^2 + h*k)
-            # qy_factor = l (this is not one, it is 'L')
-            qx_factor = 1.1547005383792517 * (hkl[0]*hkl[0] + hkl[1]*hkl[1] + hkl[0]*hkl[1]) 
-            qy_factor = hkl[2]
-        else:
-            raise ValueError("Other structure types are not implemented yet. Allowed types 'wz'.")
-        Q_x_theor, Q_y_theor = qx_factor/a*mul_fact[0] + shift[0], qy_factor/c*mul_fact[1] + shift[1]
-        return Q_x_theor, Q_y_theor
+        self.two_theta_values = XX * mul_fact[0] + shift[0]
+        self.omega_values = YY* mul_fact[1] + shift[1]
+        return 
         
-    @classmethod
-    def _Qxy_xrd(cls, omega, two_theta, col_n, shift=[0,0], R_val=1, mul_fact=[10000,10000]):
+    def _xrd_reciprocal_space_map(self, shift=[0,0], mul_fact=[10000,10000]):
         '''
         Definitions:
             Q_x = R(cos(omega) - cos(2*theta-omega))
-            Q_y = R(sin(omega) + sin(2*theta-omega))
+            Q_z = R(sin(omega) + sin(2*theta-omega))
             degree2radian = pi/180
-            Return: Q_x, Q_y
 
-        Parameters
-        ----------
-        omega : TYPE
-            DESCRIPTION.
-        two_theta : TYPE
-            DESCRIPTION.
-        col_n : TYPE
-            DESCRIPTION.
-        shift : TYPE, optional
-            DESCRIPTION. The default is [0,0].
-        R_val : TYPE, optional
-            DESCRIPTION. The default is 1.
-        mul_fact : TYPE, optional
-            DESCRIPTION. The default is [10000,10000].
-
-        Returns
-        -------
-        Q_x : TYPE
-            DESCRIPTION.
-        Q_y : TYPE
-            DESCRIPTION.
-
-        '''
-        two_theta_ = np.array([np.linspace(start_, end_, num=col_n) for start_, end_ in two_theta])
-        omega_list = np.array([[omega_val]*col_n for omega_val in omega])
+        '''    
+        R_val = 1/self.lambda_wavelength
         
-        omega_rad = omega_list*degree2radian
-        two_theta_m_omega_rad = (two_theta_ - omega_list)*degree2radian
+        omega_rad = self.omega_values*degree2radian
+        two_theta_m_omega_rad = (self.two_theta_values - self.omega_values)*degree2radian
         
         sin_omega = np.sin(omega_rad)
         sin_2theta_omega = np.sin(two_theta_m_omega_rad)
         
         cos_omega = np.cos(omega_rad)
         cos_2theta_omega = np.cos(two_theta_m_omega_rad)
-        return R_val * (cos_omega - cos_2theta_omega) * mul_fact[0] + shift[0], R_val * (sin_omega + sin_2theta_omega) * mul_fact[1] + shift[1]
+        
+        self.rsm_x = R_val * (cos_omega - cos_2theta_omega) * mul_fact[0] + shift[0] 
+        self.rsm_y = R_val * (sin_omega + sin_2theta_omega) * mul_fact[1] + shift[1]
+        return 
+      
+    def _xrd_read_parse_file_(self, shift=[0,0], mul_fact_xy_axis=[1,1]):
+        """
+        This function reads the XRD file and/or generate reciprocal space data.
 
-    @classmethod
-    def _calc_alloy_params(cls, t, binary_parameters, mul_fact, alloy_type, str_type, hkl):
-        alloy_a, alloy_c, _, _, alloy_D = \
-            _general_fns._alloy_parameters_from_binary(t, binary_parameters, alloy_type=alloy_type, structure_type=str_type)    
-        Qx_theor, Qy_theor = cls._Qxy_theor(alloy_a, alloy_c, mul_fact=mul_fact, hkl=hkl, structure_type=str_type)
-        return alloy_D, Qx_theor, Qy_theor
-    
-    @classmethod
-    def _calculate_FG_factors(cls, alloy_D, Qx, Qy):
-        # F_fact, G_fact = alloy_D * Qx / Qy, (1. - alloy_D) / Qy
-        return alloy_D * Qx / Qy, (1. - alloy_D) / Qy
-    
-    @classmethod
-    def _calculate_full_strain_line(cls, Qxs, composition, binary_parameters, mul_fact, alloy_type, str_type, hkl):
-        alloy_D, Qx_theor, Qy_theor  = \
-            cls._calc_alloy_params(composition, binary_parameters, mul_fact, alloy_type, str_type, hkl)   
-        F_fact, G_fact = cls._calculate_FG_factors(alloy_D, Qx_theor, Qy_theor) 
-        return Qxs / (F_fact + Qxs * G_fact)
+        Parameters
+        ----------
+        shift : list of 2 floats, optional
+            Shift the x and y-cordinates of the data points by shift amount, i.e.,
+            x_val += shift[0], y_val += shift[1].
+            The default is [0,0].
+        mul_fact_xy_axis : list of 2 floats, optional
+            Multipy the x and y-cordinates of the data points by this amount, i.e.,
+            x_val *= shift[0], y_val *= shift[1]. 
+            The default is [1,1].
+
+        Returns
+        -------
+        ndarrays [x, y, intensity_values]
+            This ndarrays can be directly passed to the xrd_plot function.
+            For xrd_file_fmt = 'xrdml':
+                For 'reciprocal_space_map' returns the X, Y, and Z/intensity-values for the RSM.
+                For 'omega_2theta_space_map' return 2-theta, Omega/2-theta, and intensity values.
+
+        """
+        if self._read_file_mode == 'reciprocal_space_map':
+            shift_tmp, mul_fact_tmp = shift, mul_fact_xy_axis
+            shift, mul_fact_xy_axis = [0,0], [1,1]
+
+        self._read_xrd_data_from_file(shift=shift, mul_fact=mul_fact_xy_axis)
         
-    @classmethod
-    def _find_zero_of_function(cls, t, qxy_for_point, binary_parameters, mul_fact, alloy_type, str_type, hkl):
-        alloy_D, Qx_theor, Qy_theor  = \
-            cls._calc_alloy_params(t, binary_parameters, mul_fact, alloy_type, str_type, hkl)   
-        F_fact, G_fact = cls._calculate_FG_factors(alloy_D, Qx_theor, Qy_theor)
-        return qxy_for_point[1] * (F_fact + qxy_for_point[0] * G_fact) - qxy_for_point[0] 
-        
-    def _find_composition_strain_4_point(self, find_results_4_peak, reference_peak, f_args, comp_interval=[0, 1], 
-                                         root_finding_method='brentq', fprime=None, fprime2=None, 
-                                         x0=None, x1=None, xtol=None, rtol=None, maxiter=None):
-        sol = optimize.root_scalar(self._find_zero_of_function, args=((find_results_4_peak,) + f_args), 
-                                   bracket=comp_interval, method=root_finding_method, 
-                                   fprime=fprime, fprime2=fprime2, x0=x0, x1=x1, xtol=xtol, rtol=rtol, maxiter=maxiter)
-        assert sol.converged, 'Root finding not converged. Try other methods.'
-        _, Qx2, _ = self._calc_alloy_params(sol.root, f_args[0], f_args[1], f_args[2], f_args[3], f_args[4])
-        relaxation = (1 - reference_peak[0]/find_results_4_peak[0]) / (1 - reference_peak[0]/Qx2)
-        if self.log_info is not None:
-            print(f'Solution for requested peak/point: {find_results_4_peak}')
-            print(f'\t{"-Composition (%)":<25}: {sol.root*100:.2f}')
-            print(f'\t{"-Strain-relaxation (%)":<25}: {relaxation*100:.2f}')
-        return sol, relaxation
+        if self._read_file_mode == 'reciprocal_space_map':
+            shift, mul_fact_xy_axis = shift_tmp, mul_fact_tmp
+            self._xrd_reciprocal_space_map(shift=shift, mul_fact=mul_fact_xy_axis)
+            return self.rsm_x, self.rsm_y, self.intensity_values
+        else:
+            return self.two_theta_values, self.omega_values, self.intensity_values 

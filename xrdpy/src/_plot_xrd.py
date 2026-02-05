@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import colors
+from matplotlib import cm
 from ..BasicFunctions._general_plot_functions import _GeneratePlots
 
 ### ===========================================================================
@@ -11,48 +11,33 @@ class _xrdplot(_GeneratePlots):
     """
     def __init__(self, x_values=None, y_values=None, z_values=None, 
                  save_figure_dir='.'):
-        """
-        Initialize the band structure plotting class.
-
-        Parameters
-        ----------
-        rsm_intesity : 2D array, optional
-            Reciprocal map intensity values. The default is None.
-        save_figure_dir : str/path, optional
-            Directory where to save the figure. The default is current directory.
-            
-        Returns
-        -------
         
-
-        """
-        _GeneratePlots.__init__(self, save_figure_dir=save_figure_dir)
-        
+        _GeneratePlots.__init__(self, save_figure_dir=save_figure_dir)       
         if z_values is None:
             try:
-                self.ZZ = self.rsm_values.copy()
+                self.ZZ = self.intensity_values.copy() 
             except:
-                raise ValueError('Provide reciprocal map intensity values.')
+                raise ValueError('Provide intensity or count values for the map.')
         else:
             self.ZZ = z_values.copy()
 
         if x_values is None:
             try:
-                self.XX = self.two_theta_values.copy()
+                
+                self.XX = self.two_theta_values.copy() if self.plt_mode == 'omega_2theta_space_map' else self.rsm_x.copy()
             except:
-                raise ValueError('Provide 2 theta values (in real space) or Qx (in reciprocal space).')
+                raise ValueError('Provide 2*theta values (in real space) or Qx (in reciprocal space).')
         else:
             self.XX = x_values.copy()
 
         if y_values is None:
             try:
-                self.YY = self.omega_values.copy()
+                self.YY = self.omega_values.copy() if self.plt_mode == \
+                    'omega_2theta_space_map' else self.rsm_y.copy()
             except:
-                raise ValueError('Provide omega values (in real space) or Qy (in reciprocal space).')
+                raise ValueError('Provide omega values (in real space) or Qz (in reciprocal space).')
         else:
             self.YY = y_values.copy()
-
-        self.row_n, self.col_n = np.shape(self.ZZ)
 
     @classmethod
     def _data_curation_threshold(cls, full_data, threshold_weight:float=1e-5):
@@ -64,19 +49,21 @@ class _xrdplot(_GeneratePlots):
     def _plot(self, fig=None, ax=None, save_file_name=None, CountFig=None, 
               Xmin=None, Xmax=None, Ymin=None, Ymax=None, 
               threshold_intensity:float=None,  
-              mode:str="real_space", xaxis_label:str=r'2$\mathrm{\theta}$',
-              yaxis_label:str=r'$\omega$ / $2\theta$', title_text=None,  
-              color_map='viridis', color_scale='linear', line_color='k',
+              mode:str="reciprocal_space_map", xaxis_label:str='Qx (rlu)',
+              yaxis_label:str='Qz (rlu)', title_text=None,  
+              color_map='viridis', color_scale='log', line_color='k',
               line_style='--', show_colorbar:bool=False, colorbar_label:str=None,
-              vmin=None, vmax=None, show_plot:bool=True, show_contours:bool=False,
-              savefig:bool=False, **kwargs_savefig):
+              vmin=None, vmax=None, show_contours:bool=True, contour_levels=None, 
+              show_plot:bool=True, savefig:bool=False, **kwargs_savefig):
         """
-        Plot of the maps.
+        This function is for plottings. It supports plottings of XRD plots 
+        automatically from XRD data or user specified specific 2D plots.
 
         Parameters
         ----------
         fig : matplotlib.pyplot figure instance, optional
-            Figure instance to plot on. The default is None.
+            Figure instance to plot on. If None new figure
+            will be created/initialized. The default is None. 
         ax : matplotlib.pyplot axis, optional
             Figure axis to plot on. If None, new figure will be created.
             The default is None.
@@ -85,6 +72,10 @@ class _xrdplot(_GeneratePlots):
             The default is None.
         CountFig: int, optional
             Figure count. The default is None.
+        Xmin : float, optional
+            Minimum in X-scale. The default is None.
+        Xmax : float, optional
+            Maximum in X-scale. The default is None.
         Ymin : float, optional
             Minimum in Y-scale. The default is None.
         Ymax : float, optional
@@ -92,16 +83,18 @@ class _xrdplot(_GeneratePlots):
         threshold_intensity : float, optional
             The rsm_intensities with intensities lower than the threshold_intensity 
             are discarded. The default is None. If None, this is ignored.
-        mode : ['real_space', 'reciprocal_space', 'simple_2d_plot'], optional
-            Mode of plot. The default is "real_space".
+        mode : ['omega_2theta_space_map', 'reciprocal_space_map', 'simple_2d_plot'], optional
+            Mode of plottings. The default is "reciprocal_space_map".
         xaxis_label : str, optional
-            X-axis label text. The default is '2theta'.
+            X-axis label text. The default is 'Qx (rlu)'.
         yaxis_label : str, optional
-            Y-axis label text. The default is 'omega/2theta'.
+            Y-axis label text. The default is 'Qz (rlu)'.
+        title_text : str, optional
+            Title label text. The default is None. If None no title is added
         color_map: str/ matplotlib colormap
             Colormap for density plot. The default is viridis.
         color_scale : str, optional ['log', 'linear']
-            The default is 'linear'.
+            The default is 'log'.
         line_color : matplotlib color, optional
             Color of border lines or for 2d line plots. The default is 'k'.
         line_style : matplotlib line style, optional
@@ -114,17 +107,22 @@ class _xrdplot(_GeneratePlots):
         vmin, vmax : float, optional
             vmin and vmax define the data range that the colormap covers. 
             By default, the colormap covers the complete value range of the supplied data.
+        show_contours : bool, optional
+            Show plot as contour maps. If false continous colorbar will be used.
+            The default is True.
+        contour_levels : int or array-like, optional
+            Determines the number and positions of the contour lines / regions. 
+            If an int n, use MaxNLocator, which tries to automatically choose 
+            no more than n+1 "nice" contour levels between minimum and maximum 
+            numeric values of Z. The values must be in increasing order.
+            The default is None. If None, it is automatically determined to fit
+            vmin and vmax in an optimized way.
         show_plot : bool, optional
             To show the plot when not saved. The default is True.
         savefig : bool, optional
             To save the plot. Ignored when save_file_name is None. The default is True.
         **kwargs_savefig : dict
             The matplotlib keywords for savefig function.
-        
-        Raises
-        ------
-        ValueError
-            If plot mode is unknown.
 
         Returns
         -------
@@ -146,19 +144,17 @@ class _xrdplot(_GeneratePlots):
             
         result = self._data_curation_threshold(self.ZZ, threshold_weight=threshold_intensity)
         
-        # Plot as fat band
-        if "real_space" in mode:
-            self.XX = np.array([np.linspace(start_, end_, num=self.col_n) for start_, end_ in self.XX])
-            self.YY = np.array([[omega_val]*self.col_n for ii, omega_val in enumerate(self.YY)])
-            ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, cmap=color_map, color_scale=color_scale, 
-                                                    vmin=vmin, vmax=vmax, show_contours=show_contours)
-        elif "reciprocal_space" in mode:
-            ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, cmap=color_map, color_scale=color_scale, 
-                                                    vmin=vmin, vmax=vmax, show_contours=show_contours)
-        elif mode == 'simple_2d_plot': 
+        if vmin is None: vmin = np.nanmin(result)
+        if vmax is None: vmax = np.nanmax(result)
+
+        if mode == 'simple_2d_plot': 
             return_plot = ax.plot(self.XX, self.YY, color=line_color, ls=line_style)
         else:
-            raise ValueError("Unknownplot mode: '{}'".format(mode))
+            ax, return_plot = self._plot_colormesh(self.XX, self.YY, result, ax, 
+                                                   cmap=color_map, color_scale=color_scale, 
+                                                   vmin=vmin, vmax=vmax, 
+                                                   show_contours=show_contours, 
+                                                   contour_levels=contour_levels)
             
         if show_colorbar and (self.fig is not None):
             cbar = self.fig.colorbar(return_plot, ax=ax)
@@ -169,7 +165,7 @@ class _xrdplot(_GeneratePlots):
         ax.set_xlabel(xaxis_label)
         if title_text is not None: ax.set_title(title_text)
         
-        if mode in ["real_space", "reciprocal_space"]:
+        if mode in ["omega_2theta_space_map", "reciprocal_space_map"]:
             xx_, yy_ = self._plot_borders()
             ax.plot(xx_, yy_, c=line_color, ls=line_style)
 
@@ -198,14 +194,18 @@ class _xrdplot(_GeneratePlots):
 
     @classmethod
     def _get_color_scale(cls, color_scale, vmin=None, vmax=None):
-        if color_scale.lower() == 'log': 
-            return colors.LogNorm(vmin=vmin, vmax=vmax) # logarithmic
-        else: 
-            return colors.Normalize(vmin=vmin, vmax=vmax) # linear
+        return cm.colors.LogNorm(vmin=vmin, vmax=vmax) if color_scale.lower() == 'log' \
+                    else cm.colors.Normalize(vmin=vmin, vmax=vmax)
+    @classmethod
+    def _get_contour_levels(cls, color_scale, vmin, vmax, contour_levels:int):
+        #print(vmin, vmax, np.logspace(vmin, vmax, contour_levels))
+        return np.logspace(vmin, vmax, contour_levels) if color_scale.lower() == 'log' \
+                    else np.linspace(vmin, vmax, contour_levels)
               
-    def _plot_colormesh(self, two_theta, omega_list, data_4_plot, ax, 
+    def _plot_colormesh(self, XX, YY, ZZ, ax, 
                         cmap="jet", color_scale='linear', 
-                        vmin=None, vmax=None, show_contours:bool=False):      
+                        vmin=None, vmax=None, 
+                        show_contours:bool=False,contour_levels=None):      
         """
         Plot density plot of band structure.
 
@@ -231,10 +231,20 @@ class _xrdplot(_GeneratePlots):
             Plot instance.
 
         """
-        pcm = ax.pcolormesh(two_theta, omega_list, data_4_plot, shading='nearest', 
-                            cmap=cmap, norm=self._get_color_scale(color_scale, vmin=vmin, vmax=vmax))
+        norm = self._get_color_scale(color_scale, vmin=vmin, vmax=vmax)
         ax.set_aspect('auto')
         if show_contours:
-            CS = ax.contour(two_theta, omega_list, data_4_plot, colors='k', linewidths=1)
-            #ax.clabel(CS, inline=True, fontsize=10)
-        return ax, pcm
+            if contour_levels is None or isinstance(contour_levels, int): 
+                vmin_contour = np.log10(10**np.floor(np.log10(vmin)))
+                vmax_contour = np.log10(10**np.ceil(np.log10(vmax)))
+                if contour_levels is None: 
+                    contour_levels = 2*(int(vmax_contour - vmin_contour)) + 1
+                    #print(vmax_contour, vmin_contour)
+                contour_levels = self._get_contour_levels(color_scale,vmin_contour , 
+                                                          vmax_contour, contour_levels)
+            cset1 = ax.contourf(XX, YY, ZZ, levels=contour_levels, norm=norm,cmap=cmap)
+            #cset2 = ax.contour(XX, YY, ZZ, cset1.levels, linewidths=1, colors='k')
+            #cset2.set_linestyle('solid')
+        else:
+            cset1 = ax.pcolormesh(XX, YY, ZZ, shading='nearest', cmap=cmap, norm=norm)
+        return ax, cset1

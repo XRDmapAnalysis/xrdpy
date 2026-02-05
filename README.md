@@ -4,24 +4,20 @@
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
-![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_real_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_2reciprocal_space.png)
+![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/real_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/reciprocal_space.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/detect_peaks.png)
 :-------------------------:|:-------------------------:|:-------------------------:
-AlGaN/AlN HEMT real space XRD | AlGaN/AlN HEMT reciprocal space XRD | AlGaN/AlN HEMT reciprocal space (rescaled) XRD
+Real space map | Reciprocal space map | Detecting RSM peaks (example-1)
 
-![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_peaks.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space_overlay.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/AlN_AlGaN_AlN_reciprocal_space_overlay2.png)
+![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/sensitive_peaks.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/reciprocal_space_overlay.png) | ![](https://raw.githubusercontent.com/XRDmapAnalysis/xrdpy/refs/heads/main/imgs/rsm_rotation.png)
 :-------------------------:|:-------------------------:|:-------------------------:
-Reciprocal space XRD with peaks | Reciprocal space XRD maps merging | Reciprocal space (rescaled) XRD merging
+Detecting sensitive RSM peaks (peak detection at low intesity) | Merged RSM maps (including strain calculations) | Aligning RSM maps using $\omega$ rotation (2nd sample is relaxed)
 <!-- =========================================================== -->
 
 <!-- =========================================================== -->
 ## Developers and contributors
 <!-- =========================================================== -->
 
-__Developer of xrdpy :__
-
-* [Badal Mondal](https://github.com/bmondal94)
-
-* [Pietro Pampili](https://github.com/pampili)
+__Developer of xrdpy :__ [Badal Mondal](https://github.com/bmondal94), [Pietro Pampili](https://github.com/pampili)
 
 __xrdpy Contributors:__  [Contributors](https://github.com/XRDmapAnalysis/xrdpy/graphs/contributors)
 
@@ -29,7 +25,8 @@ __xrdpy Contributors:__  [Contributors](https://github.com/XRDmapAnalysis/xrdpy/
 
 __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gmail.com,pietro.pampili@tyndall.ie)
 
-* If you would like to contribute to the development of `xrdpy` or request new functionality, please get in touch with [us](mailto:badalmondal.chembgc@gmail.com,pietro.pampili@tyndall.ie) or open a pull request. We appreciate and respect our users' views and are committed to providing the best experience possible. Your feedback is highly valued. We will be happy to support your request ASAP.
+* If you would like to contribute to the development of `xrdpy` or request new functionality, please get in touch with [us](mailto:badalmondal.chembgc@gmail.com,pietro.pampili@tyndall.ie) or open a pull request or discuss [here](https://github.com/XRDmapAnalysis/xrdpy/discussions). We appreciate and respect our users' views and are committed to providing the best experience possible. Your feedback is highly valued. We will be happy to support your request ASAP.
+
 
 <!-- =========================================================== -->
 
@@ -44,7 +41,7 @@ __Contact us:__ [Email developer/maintainer team](mailto:badalmondal.chembgc@gma
     7. matplotlib
 ```
 
-### 3. Installation using `pip` [*recommended] [*coming soon]
+### 3. Installation using `pip` [*recommended]
 
 ```
     pip install xrdpy
@@ -68,7 +65,7 @@ Or,
 
 <!-- =========================================================== -->
 ## Usage
-## Usage
+
 __Wiki page__: [Welcome to xrdpy](https://github.com/XRDmapAnalysis/xrdpy/wiki)
 
 __Documentation__: [Package documentation](https://github.com/XRDmapAnalysis/xrdpy/wiki/01.-Package-documentation)
@@ -77,7 +74,7 @@ __Discussions__: [Discuss more about the package here](https://github.com/XRDmap
 
 __Tutorials__: [tutorial](https://github.com/XRDmapAnalysis/xrdpy/tree/main/tutorials)
 
-
+__Theoretical details__: [TBA](https://github.com/XRDmapAnalysis/xrdpy/blob/main/docs/models.pdf)
 <!-- =========================================================== -->
 ## Tips and tricks:
 
@@ -94,11 +91,14 @@ If you use `xrdpy` in your work, please:
 
   * **State EXPLICITLY that you have used the xrdpy code** (or a modified version of it, if this is the case), for instance, adding a sentence like:
 
-         "The XRD analysis is performed using the xrdpy code"
+         "The XRD analysis is performed using the xrdpy code."
+
+  * **How to cite the package:** (use appropriate version number and doi corresponding to your installed xrdpy)
+>> Badal Mondal and Pietro Pampili, "XRDmapAnalysis/xrdpy: version-V.V.V (vV.V.V))". Zenodo, 2026. doi: XXXXX
 
   * **Read and cite the following papers** (and the appropriate references therein):
     
->> 1.
+>> TBA
 
 __Bibliography file:__ Here is the [bibliography file](https://github.com/XRDmapAnalysis/xrdpy/wiki/03.-References-(bibliography-style)) for your convenience.
 
@@ -119,8 +119,8 @@ Chekout out [version release history here](https://github.com/XRDmapAnalysis/xrd
 
 <!-- =========================================================== -->
 ## Upcoming (TBD)
-1. Rotation
-2. ZB structure
-3. Quaternary alloy
+1. ZB structure
+2. Implement arbritraty 1D line scan capability on 2D RSM plots
+2. Quaternary alloy
 <!-- =========================================================== -->
 

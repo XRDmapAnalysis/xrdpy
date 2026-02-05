@@ -61,8 +61,8 @@ class _PeaksDetection:
         return image_filter, self._get_peaks(image_)
 
     def _xrd_find_peaks(self, XX, YY, image):
-        image_filter, detected_peaks = self._detect_peaks(image)
+        image_z_filter, detected_peaks = self._detect_peaks(image)
         peaks_x = XX[detected_peaks]
         peaks_y = YY[detected_peaks]
         peaks_z = image[detected_peaks]
-        return image_filter, peaks_x, peaks_y, peaks_z
+        return peaks_x, peaks_y, peaks_z, image_z_filter
