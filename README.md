@@ -1,4 +1,4 @@
-# `xrdpy`: Python package for 2D X-ray diffraction data analysis
+# `xrdpy`: Python package for 2D X-ray diffraction data analysis  **testing**
 
 
 <!-- =========================================================== -->
