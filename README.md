@@ -94,11 +94,11 @@ If you use `xrdpy` in your work, please:
          "The XRD analysis is performed using the xrdpy code."
 
   * **How to cite the package:** (use appropriate version number and doi corresponding to your installed xrdpy)
->> Badal Mondal and Pietro Pampili, "XRDmapAnalysis/xrdpy: version-V.V.V (vV.V.V))". Zenodo, 2026. doi: XXXXX
+>> Badal Mondal and Pietro Pampili, "XRDmapAnalysis/xrdpy: version-0.0.5 (v0.5.5))". Zenodo, 2026. doi:[10.5281/zenodo.18498887](https://doi.org/10.5281/zenodo.18498887)
 
   * **Read and cite the following papers** (and the appropriate references therein):
     
->> TBA
+>> P. Pampili, V. Z. Zubialevich, B. Mondal, J. Mukherjee, S. Schulz, D. A. J. Moran, and P. J. Parbrook, [Appl. Phys. Lett. 128,262108 (2026).](https://doi.org/10.1063/5.0325471)
 
 __Bibliography file:__ Here is the [bibliography file](https://github.com/XRDmapAnalysis/xrdpy/wiki/03.-References-(bibliography-style)) for your convenience.
 
